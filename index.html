@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Qualité de l’eau — France</title>
+  <meta name="description" content="Qualité de l’eau potable en France (Hub’Eau). Recherche par ville, code postal ou géolocalisation." />
+
+  <style>
+/* Premium iOS-like dark theme (simple, clean, card-first) */
+:root{
+  --bg:#1C1C1E;          /* app background */
+  --card:#2D2D2F;        /* card background */
+  --card2:#262629;       /* inner surfaces */
+  --text:#F5F5F7;
+  --muted:#A1A1AA;
+  --border:rgba(255,255,255,.08);
+
+  --shadow: 0 18px 45px rgba(0,0,0,.50);
+  --shadow2: 0 10px 25px rgba(0,0,0,.38);
+  --radius:24px;
+
+  --btn-primary:#333333; /* validate button */
+  --btn-primary-h:#3A3A3A;
+
+  --focus: 0 0 0 4px rgba(255,255,255,.10);
+
+  /* Status */
+  --ok-bg: rgba(52, 211, 153, .16);
+  --ok-tx: #34D399;
+  --bad-bg: rgba(248, 113, 113, .16);
+  --bad-tx: #F87171;
+  --unk-bg: rgba(203, 213, 225, .14);
+  --unk-tx: #CBD5E1;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color:var(--text);
+  background:
+    radial-gradient(900px 520px at 15% -10%, rgba(255,255,255,.06), transparent 60%),
+    radial-gradient(800px 520px at 85% 0%, rgba(255,255,255,.04), transparent 55%),
+    linear-gradient(180deg, #151516, var(--bg));
+  min-height:100vh;
+}
+
+.wrap{
+  max-width:980px;
+  margin:0 auto;
+  padding:28px 18px 64px;
+}
+
+header{
+  text-align:center;
+  padding:18px 0 24px;
+}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background: rgba(45,45,47,.70);
+  box-shadow: var(--shadow2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size:13px;
+  color:var(--muted);
+}
+
+h1{
+  margin:14px 0 8px;
+  font-size:clamp(28px,3.6vw,44px);
+  letter-spacing:-0.03em;
+  line-height:1.05;
+}
+
+.sub{
+  margin:0 auto;
+  max-width:64ch;
+  color:var(--muted);
+  font-size:15.5px;
+  line-height:1.55;
+}
+
+.grid{
+  display:grid;
+  gap:16px;
+  grid-template-columns:1fr;
+  margin-top:22px;
+}
+
+@media (min-width:900px){
+  .grid{grid-template-columns:1.1fr .9fr; align-items:start}
+}
+
+/* Main cards */
+.card{
+  position:relative;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00)), var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+
+/* subtle top glow */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-1px -1px auto -1px;
+  height:110px;
+  background: radial-gradient(420px 140px at 18% 20%, rgba(255,255,255,.08), transparent 65%);
+  pointer-events:none;
+}
+
+.card-header{
+  position:relative;
+  padding:18px 18px 12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.card-title{
+  font-size:16px;
+  margin:0 0 6px;
+  letter-spacing:-0.01em;
+}
+
+.card-desc{
+  margin:0;
+  color:var(--muted);
+  font-size:13.5px;
+  line-height:1.45;
+}
+
+.card-body{
+  padding:16px 18px 18px;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+/* Inputs */
+.input{
+  flex:1 1 260px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  padding:12px 14px;
+  font-size:15px;
+  outline:none;
+  background: rgba(28,28,30,.72);
+  color:var(--text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.input::placeholder{color:rgba(161,161,170,.85)}
+
+.input:focus{
+  border-color: rgba(255,255,255,.16);
+  box-shadow: var(--focus);
+}
+
+/* Buttons */
+.btn{
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(28,28,30,.72);
+  color:var(--text);
+  padding:12px 14px;
+  border-radius:18px;
+  font-weight:650;
+  cursor:pointer;
+  transition: transform .05s ease, background .18s ease, border-color .18s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.btn:hover{
+  background: rgba(38,38,41,.85);
+}
+
+.btn:active{
+  transform: scale(.99);
+}
+
+.btn-primary{
+  background: var(--btn-primary);
+  border-color: rgba(255,255,255,.08);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.btn-primary:hover{
+  background: var(--btn-primary-h);
+}
+
+.btn:disabled,
+.btn-primary:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+/* Helper text */
+.hint{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.45;
+}
+
+.divider{
+  height:1px;
+  background: rgba(255,255,255,.08);
+  margin:14px 0;
+}
+
+/* Choices list */
+.choices{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:12px;
+}
+
+.choice{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  background: rgba(28,28,30,.60);
+  cursor:pointer;
+  transition: background .18s ease, transform .05s ease, border-color .18s ease;
+}
+
+.choice:hover{
+  background: rgba(38,38,41,.82);
+  border-color: rgba(255,255,255,.14);
+}
+
+.choice:active{transform:scale(.99)}
+
+.choice small{
+  color:var(--muted);
+  display:block;
+  margin-top:2px;
+}
+
+/* KPIs */
+.kpis{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+@media (min-width:520px){
+  .kpis{grid-template-columns:1fr 1fr}
+}
+
+.kpi{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  padding:14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent),
+    rgba(28,28,30,.55);
+  box-shadow: var(--shadow2);
+}
+
+.kpi .label{
+  font-size:12.5px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.kpi .value{
+  font-size:16px;
+  font-weight:760;
+  letter-spacing:-0.01em;
+}
+
+/* Badges */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:760;
+  font-size:13px;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.badge.ok{background:var(--ok-bg); color:var(--ok-tx)}
+.badge.bad{background:var(--bad-bg); color:var(--bad-tx)}
+.badge.unk{background:var(--unk-bg); color:var(--unk-tx)}
+
+.status-line{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+
+.muted{color:var(--muted)}
+
+/* Toast / loader */
+.toast{
+  display:none;
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:18px;
+  border:1px solid rgba(248,113,113,.22);
+  background: rgba(248,113,113,.10);
+  color: var(--bad-tx);
+  font-size:13.5px;
+  line-height:1.45;
+}
+
+.toast.show{display:block}
+
+.loader{
+  display:none;
+  margin-top:12px;
+  color:var(--muted);
+  font-size:13.5px;
+}
+
+.loader.show{display:block}
+
+/* Footer */
+.footer{
+  margin-top:22px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12.5px;
+  line-height:1.55;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce){
+  .btn,.choice{transition:none}
+}
+</style>
+
+
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="pill">💧 Données officielles • Hub’Eau • Contrôle sanitaire</div>
+      <h1>Qualité de l’eau potable<br/>près de chez vous</h1>
+      <p class="sub">
+        Recherche par <strong>ville</strong> ou <strong>code postal</strong>, ou via votre <strong>géolocalisation</strong>.
+        Affiche la conformité et la date de la dernière analyse disponible.
+      </p>
+    </header>
+
+    <div class="grid">
+      <!-- Search card -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Trouver votre commune</h2>
+          <p class="card-desc">Entrez une ville (ex: “Paris”) ou un code postal (ex: “75011”).</p>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <input id="q" class="input" placeholder="Ville ou code postal…" autocomplete="off" />
+            <button id="btnSearch" class="btn btn-primary">Valider</button>
+            <button id="btnLocate" class="btn">Me localiser</button>
+          </div>
+
+          <div id="loader" class="loader">Chargement…</div>
+          <div id="toast" class="toast"></div>
+
+          <div class="hint">
+            Astuce : si plusieurs communes correspondent (cas fréquent avec un code postal),
+            choisissez la bonne dans la liste.
+          </div>
+
+          <div id="choices" class="choices" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <!-- Results card -->
+      <section class="card" id="resultsCard" style="display:none;">
+        <div class="card-header">
+          <h2 class="card-title">Résultats</h2>
+          <p class="card-desc">Résumé basé sur le <strong>dernier prélèvement</strong> disponible pour la commune.</p>
+        </div>
+        <div class="card-body">
+          <div class="kpis">
+            <div class="kpi">
+              <div class="label">Ville</div>
+              <div class="value" id="kpiCity">—</div>
+              <div class="muted" style="margin-top:6px;font-size:12.5px" id="kpiInsee">—</div>
+            </div>
+
+            <div class="kpi">
+              <div class="label">Nb d’habitants</div>
+              <div class="value" id="kpiPop">—</div>
+              <div class="muted" style="margin-top:6px;font-size:12.5px">Source: geo.api.gouv.fr</div>
+            </div>
+
+            <div class="kpi">
+              <div class="label">💧 L'eau du robinet est :</div>
+              <div class="status-line">
+                <span id="kpiOverallBadge" class="badge unk">Inconnu</span>
+                <span class="muted" id="kpiOverallText">—</span>
+              </div>
+            </div>
+
+            <div class="kpi">
+              <div class="label">🦠 Conformité bactériologique</div>
+              <div class="status-line">
+                <span id="kpiBactBadge" class="badge unk">—</span>
+              </div>
+            </div>
+
+            <div class="kpi">
+              <div class="label">🧪 Conformité chimique</div>
+              <div class="status-line">
+                <span id="kpiChemBadge" class="badge unk">—</span>
+              </div>
+            </div>
+
+            <div class="kpi">
+              <div class="label">Date de dernière analyse</div>
+              <div class="value" id="kpiLastDate">—</div>
+              <div class="muted" style="margin-top:6px;font-size:12.5px" id="kpiSampleId">—</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="muted" style="font-size:13px;line-height:1.5">
+            <strong>Note :</strong> Les résultats Hub’Eau sont à la granularité des <em>résultats d’analyses</em>,
+            et les conclusions sanitaires sont répétées sur chaque ligne d’analyse d’un même prélèvement.
+            Ici on affiche le résumé du <strong>dernier prélèvement</strong> trouvé.
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">
+      Source qualité de l’eau : Hub’Eau — API “Qualité de l’eau potable” (DIS). Mise à jour mensuelle.<br/>
+      Cette page fait des appels directs aux API (pas de serveur, pas de base de données). </br>Developed with AI by <a href="https://vikram.digital/">Vikram Sanath</a>
+    </div>
+  </div>
+
+  <script>
+    // -----------------------------
+    // Small helpers
+    // -----------------------------
+    const $ = (id) => document.getElementById(id);
+
+    function showToast(msg){
+      const el = $("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+    }
+    function clearToast(){
+      const el = $("toast");
+      el.textContent = "";
+      el.classList.remove("show");
+    }
+    function setLoading(isLoading){
+      $("loader").classList.toggle("show", isLoading);
+      $("btnSearch").disabled = isLoading;
+      $("btnLocate").disabled = isLoading;
+    }
+
+    function formatInt(n){
+      try { return new Intl.NumberFormat("fr-FR").format(n); }
+      catch { return String(n); }
+    }
+    function formatDateISOToFR(iso){
+      if(!iso) return "—";
+      const d = new Date(iso);
+      if(Number.isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString("fr-FR", { year:"numeric", month:"long", day:"2-digit" });
+    }
+
+    function normalizeOuiNon(value){
+  if(value === null || value === undefined || value === ""){
+    return { label: "—", cls: "unk" };
+  }
+
+  const v = String(value).trim().toUpperCase();
+
+  switch(v){
+    case "C":
+      return { label: "Conforme", cls: "ok" };
+
+    case "N":
+      return { label: "Non conforme", cls: "bad" };
+
+    case "D":
+      return { label: "Conforme (dérogation)", cls: "ok" };
+
+    case "S":
+      return { label: "Non mesuré", cls: "unk" };
+
+    default:
+      return { label: v, cls: "unk" };
+  }
+}
+
+
+    function normalizeConformityOverall(conclusion){
+      if(!conclusion) return { label:"Inconnu", cls:"unk", text:"Aucune conclusion trouvée." };
+      const s = String(conclusion).toLowerCase();
+      if(s.includes("non") || s.includes("défavorable") || s.includes("defavorable")){
+        return { label:"Non conforme", cls:"bad", text:String(conclusion) };
+      }
+      if(s.includes("conforme") || s.includes("favorable")){
+        return { label:"Conforme", cls:"ok", text:String(conclusion) };
+      }
+      return { label:"Inconnu", cls:"unk", text:String(conclusion) };
+    }
+
+    // -----------------------------
+    // Geo API (communes) — get INSEE + population
+    // -----------------------------
+    async function geoSearchByPostal(codePostal){
+      const url = new URL("https://geo.api.gouv.fr/communes");
+      url.searchParams.set("codePostal", codePostal);
+      url.searchParams.set("fields", "nom,code,population,codesPostaux");
+      url.searchParams.set("format", "json");
+      url.searchParams.set("limit", "10");
+      const r = await fetch(url.toString());
+      if(!r.ok) throw new Error("Geo API error");
+      return await r.json();
+    }
+
+    async function geoSearchByName(name){
+      const url = new URL("https://geo.api.gouv.fr/communes");
+      url.searchParams.set("nom", name);
+      url.searchParams.set("boost", "population");
+      url.searchParams.set("fields", "nom,code,population,codesPostaux");
+      url.searchParams.set("format", "json");
+      url.searchParams.set("limit", "10");
+      const r = await fetch(url.toString());
+      if(!r.ok) throw new Error("Geo API error");
+      return await r.json();
+    }
+
+    async function geoByLatLon(lat, lon){
+      const url = new URL("https://geo.api.gouv.fr/communes");
+      url.searchParams.set("lat", String(lat));
+      url.searchParams.set("lon", String(lon));
+      url.searchParams.set("fields", "nom,code,population,codesPostaux");
+      url.searchParams.set("format", "json");
+      url.searchParams.set("limit", "5");
+      const r = await fetch(url.toString());
+      if(!r.ok) throw new Error("Geo API error");
+      return await r.json();
+    }
+
+    // -----------------------------
+    // Hub'Eau — latest sampling summary for a commune INSEE
+    // Docs: https://hubeau.eaufrance.fr/page/api-qualite-eau-potable
+    // -----------------------------
+    async function fetchLatestWaterSample(inseeCode){
+      // Keep it small: request only what we need, sorted descending by date.
+      // Note: pagination depth limited; for "latest", first page is enough.
+      const url = new URL("https://hubeau.eaufrance.fr/api/v1/qualite_eau_potable/resultats_dis");
+      url.searchParams.set("code_commune", inseeCode);
+      url.searchParams.set("size", "5000");         // default can be high; still ok for one commune & latest
+      url.searchParams.set("page", "1");
+      url.searchParams.set("sort", "desc");
+      url.searchParams.set(
+        "fields",
+        [
+          "code_prelevement",
+          "date_prelevement",
+          "conclusion_conformite_prelevement",
+          "conformite_limites_bact_prelevement",
+          "conformite_limites_pc_prelevement",
+          "code_reseau",
+          "nom_reseau"
+        ].join(",")
+      );
+
+      const r = await fetch(url.toString());
+      if(!r.ok) throw new Error("Hub'Eau API error");
+      const json = await r.json();
+
+      const rows = Array.isArray(json?.data) ? json.data : [];
+      if(rows.length === 0) return { latest: null, distinctSamples: 0 };
+
+      // Find latest date + its sample id (grouped by code_prelevement)
+      // Since sort=desc, the first row should be among the latest, but we compute to be safe.
+      const bySample = new Map(); // sampleId -> {date, row}
+      for(const row of rows){
+        const sid = row.code_prelevement;
+        const dt = row.date_prelevement ? new Date(row.date_prelevement) : null;
+        if(!sid || !dt || Number.isNaN(dt.getTime())) continue;
+
+        const existing = bySample.get(sid);
+        if(!existing || dt > existing.date){
+          bySample.set(sid, { date: dt, row });
+        }
+      }
+
+      if(bySample.size === 0) return { latest: null, distinctSamples: 0 };
+
+      let latest = null;
+      for(const v of bySample.values()){
+        if(!latest || v.date > latest.date) latest = v;
+      }
+
+      return { latest, distinctSamples: bySample.size };
+    }
+
+    // -----------------------------
+    // Rendering
+    // -----------------------------
+    function renderChoices(communes){
+      const container = $("choices");
+      container.innerHTML = "";
+      if(!communes || communes.length === 0) return;
+
+      communes.slice(0, 10).forEach(c => {
+        const div = document.createElement("div");
+        div.className = "choice";
+        div.tabIndex = 0;
+        const cp = Array.isArray(c.codesPostaux) ? c.codesPostaux.join(", ") : "—";
+        div.innerHTML = `
+          <div>
+            <strong>${escapeHtml(c.nom || "—")}</strong>
+            <small>INSEE: ${escapeHtml(c.code || "—")} • CP: ${escapeHtml(cp)}</small>
+          </div>
+          <div class="muted" style="font-weight:650;">Choisir →</div>
+        `;
+        div.addEventListener("click", () => selectCommune(c));
+        div.addEventListener("keydown", (e) => {
+          if(e.key === "Enter" || e.key === " ") selectCommune(c);
+        });
+        container.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    async function selectCommune(commune){
+      clearToast();
+      $("choices").innerHTML = "";
+      $("resultsCard").style.display = "none";
+
+      const city = commune?.nom || "—";
+      const insee = commune?.code || "—";
+      const pop = commune?.population ?? null;
+
+      $("kpiCity").textContent = city;
+      $("kpiInsee").textContent = `Code INSEE : ${insee}`;
+      $("kpiPop").textContent = (typeof pop === "number") ? formatInt(pop) : "—";
+
+      setLoading(true);
+      try{
+        const res = await fetchLatestWaterSample(insee);
+        if(!res.latest){
+          showToast("Aucun résultat Hub’Eau trouvé pour cette commune (ou pas de date exploitable).");
+          setLoading(false);
+          return;
+        }
+
+        const row = res.latest.row;
+
+        // Overall compliance (conclusion)
+        const overall = normalizeConformityOverall(row.conclusion_conformite_prelevement);
+        const overallBadge = $("kpiOverallBadge");
+        overallBadge.className = `badge ${overall.cls}`;
+        overallBadge.textContent = overall.label;
+        $("kpiOverallText").textContent = overall.text || "—";
+
+        // Bacteriological
+        const bact = normalizeOuiNon(row.conformite_limites_bact_prelevement);
+        const bactBadge = $("kpiBactBadge");
+        bactBadge.className = `badge ${bact.cls}`;
+        bactBadge.textContent = bact.label;
+
+        // Chemical / physico-chemical
+        const chem = normalizeOuiNon(row.conformite_limites_pc_prelevement);
+        const chemBadge = $("kpiChemBadge");
+        chemBadge.className = `badge ${chem.cls}`;
+        chemBadge.textContent = chem.label;
+
+        // Dates / sample id
+        $("kpiLastDate").textContent = formatDateISOToFR(row.date_prelevement);
+        $("kpiSampleId").textContent =
+          `Dernier prélèvement : ${row.code_prelevement || "—"} • Réseau : ${row.nom_reseau || row.code_reseau || "—"} • Prélèvements trouvés (page 1): ${res.distinctSamples}`;
+
+        $("resultsCard").style.display = "block";
+      }catch(err){
+        console.error(err);
+        showToast("Erreur lors de l’appel API. Réessayez dans un instant.");
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    // -----------------------------
+    // Search / Geolocate
+    // -----------------------------
+    async function onSearch(){
+      clearToast();
+      $("choices").innerHTML = "";
+      $("resultsCard").style.display = "none";
+
+      const raw = $("q").value.trim();
+      if(!raw){
+        showToast("Entrez une ville ou un code postal.");
+        return;
+      }
+
+      setLoading(true);
+      try{
+        let communes = [];
+        const isPostal = /^[0-9]{5}$/.test(raw);
+
+        if(isPostal){
+          communes = await geoSearchByPostal(raw);
+        }else{
+          communes = await geoSearchByName(raw);
+        }
+
+        if(!Array.isArray(communes) || communes.length === 0){
+          showToast("Aucune commune trouvée. Vérifiez l’orthographe ou essayez un code postal.");
+          return;
+        }
+
+        // If one obvious result, auto-select; else show choices
+        if(communes.length === 1){
+          await selectCommune(communes[0]);
+        }else{
+          renderChoices(communes);
+        }
+      }catch(err){
+        console.error(err);
+        showToast("Impossible d’interroger geo.api.gouv.fr. Réessayez.");
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    async function onLocate(){
+      clearToast();
+      $("choices").innerHTML = "";
+      $("resultsCard").style.display = "none";
+
+      if(!("geolocation" in navigator)){
+        showToast("La géolocalisation n’est pas disponible sur ce navigateur.");
+        return;
+      }
+
+      setLoading(true);
+      try{
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 12000,
+            maximumAge: 60000
+          });
+        });
+
+        const { latitude, longitude } = pos.coords;
+
+        const communes = await geoByLatLon(latitude, longitude);
+        if(!Array.isArray(communes) || communes.length === 0){
+          showToast("Géolocalisation OK, mais aucune commune retournée. Essayez la recherche manuelle.");
+          return;
+        }
+
+        // Usually first is best match
+        await selectCommune(communes[0]);
+      }catch(err){
+        console.error(err);
+        showToast("Géolocalisation refusée ou impossible. Essayez la recherche manuelle.");
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    // Bind
+    $("btnSearch").addEventListener("click", onSearch);
+    $("btnLocate").addEventListener("click", onLocate);
+    $("q").addEventListener("keydown", (e) => {
+      if(e.key === "Enter") onSearch();
+    });
+  </script>
+</body>
+</html>
