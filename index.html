@@ -4,6 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Qualité de l’eau — France</title>
+  <!-- Favicon standard -->
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon.png">
+
+<!-- Icons Library -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- iPhone / iOS homescreen icon -->
+<link rel="apple-touch-icon" href="assets/icon.png">
+
+<!-- Permet le mode app iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Qualité Eau">
   <meta name="description" content="Qualité de l’eau potable en France (Hub’Eau). Recherche par ville, code postal ou géolocalisation." />
 
   <style>
@@ -428,6 +442,92 @@ h1{
   font-weight:650;
 }
 
+
+/* Status icons (Lucide) */
+.status-cell{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.status-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
+  color: var(--unk-tx);
+}
+
+.status-icon.ok{ color: var(--ok-tx); }
+.status-icon.bad{ color: var(--bad-tx); }
+.status-icon.unk{ color: var(--unk-tx); }
+
+.status-hint{
+  color: var(--muted);
+  font-size:12.5px;
+  line-height:1.35;
+}
+
+/* Tooltip (desktop hover + mobile tap) */
+.tip{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tip::after{
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  min-width: 180px;
+  max-width: 260px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(18,18,20,.96);
+  color: #F5F5F7;
+  font-size: 12.5px;
+  line-height: 1.35;
+  box-shadow: 0 18px 45px rgba(0,0,0,.55);
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease;
+  z-index: 50;
+}
+
+/* small arrow */
+.tip::before{
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: rgba(18,18,20,.96);
+  opacity: 0;
+  transition: opacity .12s ease;
+  z-index: 50;
+}
+
+/* Desktop hover */
+@media (hover:hover) and (pointer:fine){
+  .tip:hover::after,
+  .tip:hover::before{
+    opacity: 1;
+  }
+}
+
+/* Mobile click/tap toggled class */
+.tip.is-open::after,
+.tip.is-open::before{
+  opacity: 1;
+  pointer-events: auto;
+}
 </style>
 
 
@@ -733,6 +833,51 @@ h1{
     text.textContent = "Présence détectée.";
   }
 }
+
+
+// ---------- Regulatory thresholds (hardcoded) ----------
+// type: "limit" (limite de qualité) or "ref" (référence de qualité)
+// rule: "max" / "range" / "special" / "none"
+const THRESHOLDS = [
+  // 🦠 Microbiologique
+  { key: "ecoli",       match: [/ESCHERICHIA\s*COLI/i, /\bE\.\s*COLI\b/i], type:"limit", rule:"max", value:0, unit:"/100 mL" },
+  { key: "enteroco",    match: [/ENT[ÉE]ROCO/i, /ENTEROCO/i],             type:"limit", rule:"max", value:0, unit:"/100 mL" },
+  { key: "coliformes",  match: [/COLIFORM/i],                            type:"ref",   rule:"max", value:0, unit:"/100 mL" },
+  { key: "revivifiables", match: [/REVIVIFIABLE/i, /GERMES/i],            type:"ref",   rule:"none", note:"Pas de seuil fixe (plutôt variation anormale)." },
+
+  // ⚗️ Chimique - Nitrates/nitrites
+  { key: "nitrates",    match: [/NITRAT/i],   type:"limit", rule:"max", value:50,   unit:"mg/L" },
+  { key: "nitrites",    match: [/NITRIT/i],   type:"limit", rule:"max", value:0.5,  unit:"mg/L" },
+
+  // ⚗️ Chimique - Pesticides (règles génériques)
+  // On ne peut pas reconnaître "tous les pesticides" sans liste complète, donc:
+  // - si libellé contient "TOTAL PESTICIDES" => 0.50 µg/L
+  // - sinon si libellé contient "PESTICIDE" => 0.10 µg/L (par substance)
+  { key: "pest_total",  match: [/TOTAL\s+PESTICID/i], type:"limit", rule:"max", value:0.5,  unit:"µg/L" },
+  { key: "pest_indiv",  match: [/PESTICID/i],         type:"limit", rule:"max", value:0.1,  unit:"µg/L" },
+
+  // ⚗️ Métaux lourds (core)
+  { key: "lead",        match: [/PLOMB/i, /\bPB\b/i],   type:"limit", rule:"max", value:10, unit:"µg/L" },
+  { key: "arsenic",     match: [/ARSENIC/i, /\bAS\b/i], type:"limit", rule:"max", value:10, unit:"µg/L" },
+  { key: "cadmium",     match: [/CADMIUM/i, /\bCD\b/i], type:"limit", rule:"max", value:5,  unit:"µg/L" },
+  { key: "mercury",     match: [/MERCURE/i, /\bHG\b/i], type:"limit", rule:"max", value:1,  unit:"µg/L" },
+  { key: "nickel",      match: [/NICKEL/i, /\bNI\b/i],  type:"limit", rule:"max", value:20, unit:"µg/L" },
+  { key: "chromium",    match: [/CHROME/i, /CHROMIUM/i, /\bCR\b/i], type:"limit", rule:"max", value:50, unit:"µg/L" },
+
+  // ⚗️ Solvants (core)
+  { key: "benzene",     match: [/BENZ[ÈE]NE/i], type:"limit", rule:"max", value:1,  unit:"µg/L" },
+  { key: "tce_pce",     match: [/TRICHLORO[ -]?ÉTHYL[ÈE]NE/i, /T[ÉE]TRACHLORO[ -]?ÉTHYL[ÈE]NE/i], type:"limit", rule:"special", note:"Limite 10 µg/L pour la somme TCE+PCE (si tu as les 2 séparés, il faut les sommer)." },
+
+  // 💧 Physique
+  { key: "ph",          match: [/\bpH\b/i, /IONS\s+HYDROG/i], type:"ref", rule:"range", min:6.5, max:9, unit:"unités pH" },
+  { key: "conduct",     match: [/CONDUCTIV/i], type:"ref", rule:"range", min:180, max:1000, unit:"µS/cm@20°C", note:"Ou 200–1100 µS/cm à 25°C." },
+  { key: "temp",        match: [/TEMP[ÉE]RAT/i], type:"ref", rule:"max", value:25, unit:"°C" },
+  { key: "turb",        match: [/TURBID/i], type:"limit", rule:"max", value:1.0, unit:"NFU" },
+
+  // 🧪 PFAS
+  // Le contrôle réglementaire se fait sur la SOMME des 20 PFAS
+  { key: "pfas20_sum",  match: [/SOMME.*20.*PFAS/i, /\bPFAS[- ]?20\b/i], type:"limit", rule:"max", value:0.1, unit:"µg/L", note:"Somme des 20 PFAS (directive)."}
+];
 
 
 
@@ -1049,6 +1194,50 @@ function keywordMatch(label, keywords){
   return keywords.some(k => s.includes(k));
 }
 
+// Calculs Analyse de donées VS limites
+
+function findThresholdForLabel(label){
+  const s = label || "";
+  for(const t of THRESHOLDS){
+    if(t.match?.some(rx => rx.test(s))) return t;
+  }
+  return null;
+}
+
+function evalAgainstThreshold(row, threshold){
+  // Pas de seuil exploitable => "pas de donnée"
+  if(!threshold || threshold.rule === "none" || threshold.rule === "special"){
+    return { status:"unk", icon:"circle-slash", hint: threshold?.note || "Seuil non défini." };
+  }
+
+  // On ne compare que si on a une valeur numérique
+  const v = Number(row.resultat_numerique);
+  if(Number.isNaN(v)){
+    return { status:"unk", icon:"circle-slash", hint:"Résultat non numérique / non comparable." };
+  }
+
+  // Comparaisons
+  if(threshold.rule === "max"){
+    const ok = v <= threshold.value;
+    return {
+      status: ok ? "ok" : "bad",
+      icon: ok ? "circle-check" : "circle-x",
+      hint: `${threshold.type === "limit" ? "Limite" : "Réf."} ≤ ${threshold.value} ${threshold.unit}`
+    };
+  }
+
+  if(threshold.rule === "range"){
+    const ok = v >= threshold.min && v <= threshold.max;
+    return {
+      status: ok ? "ok" : "bad",
+      icon: ok ? "circle-check" : "circle-x",
+      hint: `${threshold.type === "limit" ? "Limite" : "Réf."} ${threshold.min}–${threshold.max} ${threshold.unit}`
+    };
+  }
+
+  return { status:"unk", icon:"circle-slash", hint:"Non comparable." };
+}
+
 // Catégorisation simple (par mots-clés)
 const MICRO_KEYS = [
   "E. COLI", "ESCHERICHIA COLI", "ENTÉROCO", "ENTEROCO",
@@ -1072,7 +1261,6 @@ function buildTable(rows){
     return `<div class="muted">Aucun paramètre trouvé pour cette catégorie sur le dernier prélèvement.</div>`;
   }
 
-  // tri alpha par libellé
   const sorted = [...rows].sort((a,b) => (a.libelle_parametre||"").localeCompare(b.libelle_parametre||""));
 
   const header = `
@@ -1081,7 +1269,7 @@ function buildTable(rows){
         <tr>
           <th>Paramètre</th>
           <th>Résultat</th>
-          <th>Limite / Référence</th>
+          <th>Statut</th>
         </tr>
       </thead>
       <tbody>
@@ -1090,10 +1278,14 @@ function buildTable(rows){
   const body = sorted.map(r => {
     const name = escapeHtml(r.libelle_parametre || "—");
     const result = escapeHtml(formatResult(r));
-    const lim = isBlank(r.limite_qualite) ? "" : `Limite: ${escapeHtml(String(r.limite_qualite))}`;
-    const ref = isBlank(r.reference_qualite) ? "" : `Réf.: ${escapeHtml(String(r.reference_qualite))}`;
-    const sep = (lim && ref) ? " • " : "";
-    const limref = (lim || ref) ? `${lim}${sep}${ref}` : "—";
+
+    const thr = findThresholdForLabel(r.libelle_parametre);
+    const eva = evalAgainstThreshold(r, thr);
+
+    const iconName = eva.icon || "circle-slash";
+    const statusCls = eva.status || "unk";
+    const hint = eva.hint ? escapeHtml(eva.hint) : "—";
+
     return `
       <tr>
         <td>
@@ -1101,13 +1293,16 @@ function buildTable(rows){
           ${isBlank(r.code_parametre) ? "" : `<div style="margin-top:6px"><span class="code-pill">code ${escapeHtml(r.code_parametre)}</span></div>`}
         </td>
         <td>${result}</td>
-        <td class="muted">${limref}</td>
+        <td>
+          <span class="tip status-icon ${statusCls}" data-tip="${hint}">
+            <i data-lucide="${iconName}"></i>
+          </span>
+        </td>
       </tr>
     `;
   }).join("");
 
-  const footer = `</tbody></table>`;
-  return header + body + footer;
+  return header + body + `</tbody></table>`;
 }
 
 function renderDetailedAnalyses(allRows, latestSampleId){
@@ -1133,6 +1328,10 @@ function renderDetailedAnalyses(allRows, latestSampleId){
   $("microContent").innerHTML = buildTable(micro);
   $("chemContent").innerHTML  = buildTable(chem);
   $("physContent").innerHTML  = buildTable(phys);
+  
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+  window.lucide.createIcons();
+  }
 }
 
 
@@ -1148,6 +1347,33 @@ document.addEventListener("click", (e) => {
   panel.classList.toggle("open", !isOpen);
   btn.classList.toggle("open", !isOpen);
 });
+
+// Mobile tap tooltips: tap icon to toggle, tap outside to close
+document.addEventListener("click", (e) => {
+  const tip = e.target.closest(".tip");
+  const isTouchLike = window.matchMedia && window.matchMedia("(hover: none)").matches;
+
+  // Only enforce click-to-open on touch-like devices
+  if(!isTouchLike) return;
+
+  // If user tapped a tooltip icon: toggle it and close others
+  if(tip){
+    document.querySelectorAll(".tip.is-open").forEach(el => {
+      if(el !== tip) el.classList.remove("is-open");
+    });
+    tip.classList.toggle("is-open");
+    e.stopPropagation();
+    return;
+  }
+
+  // Tap outside: close all
+  document.querySelectorAll(".tip.is-open").forEach(el => el.classList.remove("is-open"));
+});
+
+// Close tooltips on scroll (mobile)
+window.addEventListener("scroll", () => {
+  document.querySelectorAll(".tip.is-open").forEach(el => el.classList.remove("is-open"));
+}, { passive: true });
 
   </script>
 </body>
