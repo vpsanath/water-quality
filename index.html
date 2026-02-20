@@ -621,6 +621,36 @@ h1{
   color:var(--muted);
   font-size:13px;
 }
+
+/* ===== Median-style hero title ===== */
+
+.hero-title{
+  text-align:center;
+  font-weight:800;
+  font-size:20px;
+  line-height:1.05;
+  letter-spacing:-0.02em;
+  margin:0 0 12px 0;
+  color:var(--muted);
+}
+
+.hero-sub{
+  display:block;
+  font-weight:800;
+  font-size:20px;
+  background:linear-gradient(90deg,#0032df,#04d6e0);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+@media (min-width:640px){
+  .hero-title{
+    font-size:48px;
+  }
+  .hero-sub{
+    font-size:48px;
+  }
+}
 </style>
 
 
@@ -633,9 +663,10 @@ h1{
 
       <img src="assets/icon.png" alt="Logo" class="app-logo">
       <h1>Water Quality</h1>
-      <p class="sub">
-      <strong>Qualité de l’eau potable<br/>près de chez vous</strong>
-      </p>
+      <h1 class="hero-title">
+        Qualité de l’eau potable<br>
+        <span class="hero-sub">en temps réel</span>
+      </h1>
       <div class="pill">💧 Données officielles • Hub’Eau • Contrôle sanitaire</div>
     </header>
 
