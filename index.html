@@ -352,6 +352,82 @@ h1{
 @media (prefers-reduced-motion: reduce){
   .btn,.choice{transition:none}
 }
+
+.accordion{ display:flex; flex-direction:column; gap:10px; }
+
+.acc-btn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  background: rgba(28,28,30,.60);
+  color: var(--text);
+  cursor:pointer;
+  font-weight:750;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.acc-btn:hover{ background: rgba(38,38,41,.82); border-color: rgba(255,255,255,.14); }
+.acc-right{ display:flex; align-items:center; gap:10px; }
+.acc-count{ color: var(--muted); font-weight:650; font-size:12.5px; }
+.acc-chev{ color: var(--muted); transition: transform .15s ease; }
+
+.acc-panel{
+  display:none;
+  padding: 0 2px;
+}
+
+.acc-panel.open{ display:block; }
+.acc-btn.open .acc-chev{ transform: rotate(180deg); }
+
+.acc-content{
+  margin-top:8px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent),
+    rgba(28,28,30,.55);
+  box-shadow: var(--shadow2);
+  padding: 12px 12px;
+}
+
+.param-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:13px;
+}
+
+.param-table th, .param-table td{
+  padding:10px 10px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  vertical-align:top;
+}
+
+.param-table th{
+  text-align:left;
+  color: var(--muted);
+  font-weight:700;
+  font-size:12px;
+}
+
+.param-table tr:last-child td{ border-bottom:none; }
+
+.code-pill{
+  display:inline-flex;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: var(--muted);
+  font-size:12px;
+  font-weight:650;
+}
+
 </style>
 
 
@@ -437,6 +513,15 @@ h1{
             </div>
 
             <div class="kpi">
+              <div class="label">PFAS</div>
+              <div class="status-line">
+                <span id="kpiPFASBadge" class="badge unk">—</span>
+                <span class="muted" id="kpiPFASText">—</span>
+              </div>
+            </div>
+
+
+            <div class="kpi">
               <div class="label">Date de dernière analyse</div>
               <div class="value" id="kpiLastDate">—</div>
               <div class="muted" style="margin-top:6px;font-size:12.5px" id="kpiSampleId">—</div>
@@ -444,6 +529,49 @@ h1{
           </div>
 
           <div class="divider"></div>
+
+          <!-- Analyses détaillées (accordéons) -->
+<div class="card" style="margin-top:14px;">
+  <div class="card-header">
+    <h2 class="card-title">Analyses détaillées</h2>
+    <p class="card-desc">Détails du <strong>dernier prélèvement</strong> (si mesuré).</p>
+  </div>
+
+  <div class="card-body">
+    <div class="accordion">
+      <button class="acc-btn" type="button" data-acc="micro">
+        <span>🦠 Microbiologique</span>
+        <span class="acc-right"><span id="countMicro" class="acc-count">—</span> <span class="acc-chev">▾</span></span>
+      </button>
+      <div class="acc-panel" id="panel-micro">
+        <div id="microContent" class="acc-content muted">—</div>
+      </div>
+
+      <button class="acc-btn" type="button" data-acc="chem">
+        <span>⚗️ Chimique</span>
+        <span class="acc-right"><span id="countChem" class="acc-count">—</span> <span class="acc-chev">▾</span></span>
+      </button>
+      <div class="acc-panel" id="panel-chem">
+        <div id="chemContent" class="acc-content muted">—</div>
+      </div>
+
+      <button class="acc-btn" type="button" data-acc="phys">
+        <span>💧 Physique</span>
+        <span class="acc-right"><span id="countPhys" class="acc-count">—</span> <span class="acc-chev">▾</span></span>
+      </button>
+      <div class="acc-panel" id="panel-phys">
+        <div id="physContent" class="acc-content muted">—</div>
+      </div>
+    </div>
+
+    <div class="muted" style="margin-top:12px; font-size:12.5px; line-height:1.5">
+      Les paramètres réellement mesurés varient selon les campagnes et les réseaux. Si une catégorie est vide,
+      c’est souvent que ce n’était pas mesuré sur ce prélèvement.
+    </div>
+  </div>
+</div>
+          <div class="divider"></div>
+
 
           <div class="muted" style="font-size:13px;line-height:1.5">
             <strong>Note :</strong> Les résultats Hub’Eau sont à la granularité des <em>résultats d’analyses</em>,
@@ -456,7 +584,7 @@ h1{
 
     <div class="footer">
       Source qualité de l’eau : Hub’Eau — API “Qualité de l’eau potable” (DIS). Mise à jour mensuelle.<br/>
-      Cette page fait des appels directs aux API (pas de serveur, pas de base de données). </br>Developed with AI by <a href="https://vikram.digital/">Vikram Sanath</a>
+      Cette page fait des appels directs aux API (pas de serveur, pas de base de données). </br>Designed with AI by <a href="http://vikram.digital/">Vikram Sanath</a>
     </div>
   </div>
 
@@ -531,6 +659,83 @@ h1{
       return { label:"Inconnu", cls:"unk", text:String(conclusion) };
     }
 
+
+    // -----------------------------
+    // PFAS CALCULATOR
+    // -----------------------------
+
+    const PFAS_KEYWORDS = [
+      "PFAS","PFOS","PFOA","PFHXS","PFNA","PFDA","PFBS","PFHP","PFUNA","PFDOA","PFTRDA","PFTEDA"
+    ];
+
+    function detectPFAS(rows, sampleId){
+  const badge = $("kpiPFASBadge");
+  const text  = $("kpiPFASText");
+
+  if(!badge || !text) return;
+
+  if(!rows || rows.length === 0){
+    badge.className = "badge unk";
+    badge.textContent = "—";
+    text.textContent = "Aucune donnée.";
+    return;
+  }
+
+  const PFAS_KEYWORDS = [
+    "PFAS","PFOS","PFOA","PFHXS","PFNA","PFDA","PFBS","PFHP","PFUNA","PFDOA","PFTRDA","PFTEDA"
+  ];
+
+  const sampleRows = rows.filter(r => r.code_prelevement === sampleId);
+
+  const pfasRows = sampleRows.filter(r => {
+    const label = (r.libelle_parametre || "").toUpperCase();
+    return PFAS_KEYWORDS.some(k => label.includes(k));
+  });
+
+  // ⚪ Non mesuré
+  if(pfasRows.length === 0){
+    badge.className = "badge unk";
+    badge.textContent = "Non mesuré";
+    text.textContent = "Aucun paramètre PFAS analysé.";
+    return;
+  }
+
+  // Trouver la valeur max détectée
+  let maxValue = null;
+  let maxRow = null;
+
+  for(const r of pfasRows){
+    const val = Number(r.resultat_numerique);
+    if(!isNaN(val)){
+      if(maxValue === null || val > maxValue){
+        maxValue = val;
+        maxRow = r;
+      }
+    }
+  }
+
+  // 🟢 Aucun détecté (mesuré mais 0)
+  if(maxValue === 0){
+    badge.className = "badge ok";
+    badge.textContent = "Aucun détecté";
+    text.textContent = "PFAS analysés — aucune détection.";
+    return;
+  }
+
+  // 🟡 Détecté
+  badge.className = "badge bad";
+  badge.textContent = "PFAS détectés";
+
+  if(maxRow){
+    const unit = maxRow.libelle_unite || "";
+    text.textContent = `${maxRow.libelle_parametre} : ${maxValue} ${unit}`.trim();
+  }else{
+    text.textContent = "Présence détectée.";
+  }
+}
+
+
+
     // -----------------------------
     // Geo API (communes) — get INSEE + population
     // -----------------------------
@@ -590,7 +795,17 @@ h1{
           "conformite_limites_bact_prelevement",
           "conformite_limites_pc_prelevement",
           "code_reseau",
-          "nom_reseau"
+          "nom_reseau",
+
+          // champs d'analyse (pour l'accordéon)
+          "code_parametre",
+          "libelle_parametre",
+          "resultat_numerique",
+          "resultat_textuel",
+          "libelle_unite",
+          "limite_qualite",
+          "reference_qualite",
+          "conformite_parametre"
         ].join(",")
       );
 
@@ -599,7 +814,7 @@ h1{
       const json = await r.json();
 
       const rows = Array.isArray(json?.data) ? json.data : [];
-      if(rows.length === 0) return { latest: null, distinctSamples: 0 };
+      if(rows.length === 0) return { latest: null, distinctSamples: 0, rows: [] };
 
       // Find latest date + its sample id (grouped by code_prelevement)
       // Since sort=desc, the first row should be among the latest, but we compute to be safe.
@@ -622,7 +837,8 @@ h1{
         if(!latest || v.date > latest.date) latest = v;
       }
 
-      return { latest, distinctSamples: bySample.size };
+      return { latest, distinctSamples: bySample.size, rows };
+
     }
 
     // -----------------------------
@@ -682,6 +898,15 @@ h1{
         }
 
         const row = res.latest.row;
+
+
+        if(res.rows && res.rows.length){
+          renderDetailedAnalyses(res.rows, row.code_prelevement);
+          detectPFAS(res.rows, row.code_prelevement);
+        }
+
+
+
 
         // Overall compliance (conclusion)
         const overall = normalizeConformityOverall(row.conclusion_conformite_prelevement);
@@ -804,6 +1029,126 @@ h1{
     $("q").addEventListener("keydown", (e) => {
       if(e.key === "Enter") onSearch();
     });
+
+    function isBlank(v){ return v === null || v === undefined || String(v).trim() === ""; }
+
+function formatResult(row){
+  const num = row.resultat_numerique;
+  const txt = row.resultat_textuel;
+  const unit = row.libelle_unite;
+
+  if(!isBlank(num)){
+    return `${num}${isBlank(unit) ? "" : " " + unit}`;
+  }
+  if(!isBlank(txt)) return String(txt);
+  return "—";
+}
+
+function keywordMatch(label, keywords){
+  const s = (label || "").toUpperCase();
+  return keywords.some(k => s.includes(k));
+}
+
+// Catégorisation simple (par mots-clés)
+const MICRO_KEYS = [
+  "E. COLI", "ESCHERICHIA COLI", "ENTÉROCO", "ENTEROCO",
+  "COLIFORM", "GERMES REVIVIFIABLES", "REVIVIFIABLE"
+];
+
+const PHYS_KEYS = [
+  "PH", "CONDUCTIV", "TEMPÉRAT", "TEMPERAT", "TURBIDIT", "COULEUR", "ODEUR"
+];
+
+// Chimique = tout ce qui n'est pas micro/phys (inclut nitrates, métaux, pesticides, PFAS, solvants)
+function categorizeRow(row){
+  const label = row.libelle_parametre || "";
+  if(keywordMatch(label, MICRO_KEYS)) return "micro";
+  if(keywordMatch(label, PHYS_KEYS)) return "phys";
+  return "chem";
+}
+
+function buildTable(rows){
+  if(!rows || rows.length === 0){
+    return `<div class="muted">Aucun paramètre trouvé pour cette catégorie sur le dernier prélèvement.</div>`;
+  }
+
+  // tri alpha par libellé
+  const sorted = [...rows].sort((a,b) => (a.libelle_parametre||"").localeCompare(b.libelle_parametre||""));
+
+  const header = `
+    <table class="param-table">
+      <thead>
+        <tr>
+          <th>Paramètre</th>
+          <th>Résultat</th>
+          <th>Limite / Référence</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  const body = sorted.map(r => {
+    const name = escapeHtml(r.libelle_parametre || "—");
+    const result = escapeHtml(formatResult(r));
+    const lim = isBlank(r.limite_qualite) ? "" : `Limite: ${escapeHtml(String(r.limite_qualite))}`;
+    const ref = isBlank(r.reference_qualite) ? "" : `Réf.: ${escapeHtml(String(r.reference_qualite))}`;
+    const sep = (lim && ref) ? " • " : "";
+    const limref = (lim || ref) ? `${lim}${sep}${ref}` : "—";
+    return `
+      <tr>
+        <td>
+          <div style="font-weight:700">${name}</div>
+          ${isBlank(r.code_parametre) ? "" : `<div style="margin-top:6px"><span class="code-pill">code ${escapeHtml(r.code_parametre)}</span></div>`}
+        </td>
+        <td>${result}</td>
+        <td class="muted">${limref}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const footer = `</tbody></table>`;
+  return header + body + footer;
+}
+
+function renderDetailedAnalyses(allRows, latestSampleId){
+  // Garde uniquement les lignes du dernier prélèvement
+  const sampleRows = allRows.filter(r => r.code_prelevement === latestSampleId);
+
+  // Catégorise
+  const micro = [];
+  const chem = [];
+  const phys = [];
+
+  for(const r of sampleRows){
+    const cat = categorizeRow(r);
+    if(cat === "micro") micro.push(r);
+    else if(cat === "phys") phys.push(r);
+    else chem.push(r);
+  }
+
+  $("countMicro").textContent = micro.length ? `${micro.length} paramètres` : "0";
+  $("countChem").textContent  = chem.length  ? `${chem.length} paramètres`  : "0";
+  $("countPhys").textContent  = phys.length  ? `${phys.length} paramètres`  : "0";
+
+  $("microContent").innerHTML = buildTable(micro);
+  $("chemContent").innerHTML  = buildTable(chem);
+  $("physContent").innerHTML  = buildTable(phys);
+}
+
+
+// Accordéons: open/close
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".acc-btn");
+  if(!btn) return;
+
+  const key = btn.getAttribute("data-acc");
+  const panel = document.getElementById(`panel-${key}`);
+  const isOpen = panel.classList.contains("open");
+
+  panel.classList.toggle("open", !isOpen);
+  btn.classList.toggle("open", !isOpen);
+});
+
   </script>
 </body>
 </html>
