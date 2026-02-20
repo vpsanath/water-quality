@@ -17,8 +17,10 @@
 <!-- Permet le mode app iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Qualité Eau">
-  <meta name="description" content="Qualité de l’eau potable en France (Hub’Eau). Recherche par ville, code postal ou géolocalisation." />
+<meta name="apple-mobile-web-app-title" content="Water Quality">
+<meta name="description" content="Qualité de l’eau potable en France (Hub’Eau). Recherche par ville, code postal ou géolocalisation." />
+<meta name="theme-color" content="#1C1C1E">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
   <style>
 /* Premium iOS-like dark theme (simple, clean, card-first) */
@@ -59,6 +61,15 @@ body{
     radial-gradient(800px 520px at 85% 0%, rgba(255,255,255,.04), transparent 55%),
     linear-gradient(180deg, #151516, var(--bg));
   min-height:100vh;
+}
+
+html, body{
+  background:#1C1C1E;
+}
+
+/* iOS WebApp full background fix */
+body{
+  min-height:100dvh;
 }
 
 .wrap{
