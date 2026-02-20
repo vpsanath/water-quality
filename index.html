@@ -88,6 +88,7 @@ header{
   align-items:center;
   gap:10px;
   padding:10px 14px;
+  margin-top: 20px ;
   border:1px solid var(--border);
   border-radius:999px;
   background: rgba(45,45,47,.70);
@@ -178,7 +179,7 @@ h1{
 .input{
   flex:1 1 260px;
   border:1px solid rgba(255,255,255,.10);
-  border-radius:18px;
+  border-radius:13px;
   padding:12px 14px;
   font-size:15px;
   outline:none;
@@ -539,6 +540,7 @@ h1{
   opacity: 1;
   pointer-events: auto;
 }
+
 .app-logo{
   width:72px;
   height:72px;
@@ -548,6 +550,77 @@ h1{
   margin-top: 20px;
   border-radius:18px; /* effet app icon */
 }
+
+/* ===== Search layout ===== */
+
+.search-stack{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* input + bouton intégré */
+.input-group{
+  position:relative;
+  display:flex;
+  align-items:center;
+  width:100%;
+}
+
+.input-with-btn{
+  width:100%;
+  padding-right:56px; /* espace réel pour bouton */
+  border-radius:16px;
+}
+
+/* bouton valider intégré */
+
+.btn-search{
+  position:absolute;
+  right:0px;              /* colle mieux au bord */
+  top:50%;
+  transform:translateY(-50%);
+  width:44px;
+  height:44px;
+  border-radius:16px;
+  border-color:rgba(255,255,255,.08);
+  background:var(--btn-primary);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 18px rgba(0,0,0,.35);
+  z-index:2;              /* passe AU-DESSUS de l’input */
+}
+
+.btn-search:hover{
+  background:#0028b5;
+}
+
+/* bouton se localiser */
+.btn-locate{
+  width:100%;
+  background:#0032df;
+  border:none;
+  color:white;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 12px 22px rgba(0,0,0,.35);
+}
+
+.btn-locate:hover{
+  background:#02c3cc;
+}
+
+/* séparateur OU */
+.or{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
 </style>
 
 
@@ -556,14 +629,14 @@ h1{
 <body>
   <div class="wrap">
     <header>
-      <div class="pill">💧 Données officielles • Hub’Eau • Contrôle sanitaire</div>
-      <img src="assets/icon.png" alt="Logo" class="app-logo">
+      
 
-      <h1>Qualité de l’eau potable<br/>près de chez vous</h1>
+      <img src="assets/icon.png" alt="Logo" class="app-logo">
+      <h1>Water Quality</h1>
       <p class="sub">
-        Recherche par <strong>ville</strong> ou <strong>code postal</strong>, ou via votre <strong>géolocalisation</strong>.
-        Affiche la conformité et la date de la dernière analyse disponible.
+      <strong>Qualité de l’eau potable<br/>près de chez vous</strong>
       </p>
+      <div class="pill">💧 Données officielles • Hub’Eau • Contrôle sanitaire</div>
     </header>
 
     <div class="grid">
@@ -574,10 +647,21 @@ h1{
           <p class="card-desc">Entrez une ville (ex: “Paris”) ou un code postal (ex: “75011”).</p>
         </div>
         <div class="card-body">
-          <div class="row">
-            <input id="q" class="input" placeholder="Ville ou code postal…" autocomplete="off" />
-            <button id="btnSearch" class="btn btn-primary">Valider</button>
-            <button id="btnLocate" class="btn">Me localiser</button>
+          <div class="search-stack">
+            <!-- Input + bouton intégré -->
+            <div class="input-group">
+              <input id="q" class="input input-with-btn" placeholder="Ville ou code postal…" autocomplete="off" />
+              <button id="btnSearch" class="btn btn-search">
+                <i data-lucide="move-right"></i>
+              </button>
+            </div>
+
+            <div class="or">ou</div>
+
+            <!-- Bouton géoloc full width -->
+            <button id="btnLocate" class="btn btn-locate">
+              Utiliser ma localisation
+            </button>
           </div>
 
           <div id="loader" class="loader">Chargement…</div>
@@ -706,7 +790,7 @@ h1{
 
     <div class="footer">
       Source qualité de l’eau : Hub’Eau — API “Qualité de l’eau potable” (DIS). Mise à jour mensuelle.<br/>
-      Cette page fait des appels directs aux API (pas de serveur, pas de base de données). </br>Designed with AI by <a href="http://vikram.digital/">Vikram Sanath</a>
+      Cette page fait des appels directs aux API (pas de serveur, pas de base de données). </br>Designed with AI by <a style="color: #0032df; font-weight: bold; text-decoration: unset;" href="http://vikram.digital/">Vikram Sanath</a>
     </div>
   </div>
 
@@ -1396,6 +1480,8 @@ document.addEventListener("click", (e) => {
 window.addEventListener("scroll", () => {
   document.querySelectorAll(".tip.is-open").forEach(el => el.classList.remove("is-open"));
 }, { passive: true });
+
+if (window.lucide) window.lucide.createIcons();
 
   </script>
 </body>
